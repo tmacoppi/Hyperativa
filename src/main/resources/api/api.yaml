@@ -3,6 +3,31 @@ info:
   title: Card Management API
   version: 1.0.0
 paths:
+  /api/v1/cards/register/{clientName}/{cardNumber}:
+    post:
+      tags:
+        - Card
+      summary: Cadastra um cartão para um cliente
+      operationId: registerCardForClient
+      parameters:
+        - name: clientName
+          in: path
+          required: true
+          schema:
+            type: string
+        - name: cardNumber
+          in: path
+          required: true
+          schema:
+            type: string
+      responses:
+        '200':
+          description: Cartões cadastrados com sucesso
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/CardResponse'
+
   /api/v1/cards/import:
     post:
       tags:
@@ -80,6 +105,8 @@ components:
           type: integer
         name:
           type: string
+        date:
+          type: string
         cards:
           type: array
           items:
@@ -93,4 +120,6 @@ components:
         idClient:
           type: integer
         cardNumber:
+          type: string
+        date:
           type: string

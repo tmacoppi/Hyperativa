@@ -7,22 +7,25 @@ import lombok.Setter;
 import java.time.LocalDateTime;
 
 @Entity
-@Table(name = "card") // Nome da tabela que será criada/buscada no MySQL
+@Table(name = "import")
 @Getter
 @Setter
-public class CardEntity {
+public class ImportEntity {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-    @Column(name = "client_id", nullable = false)
-    private Long idClient;
+    @Column(name = "file_name", nullable = false)
+    private String fileName;
 
-    @Column(name = "card_number", nullable = false, unique = true)
-    private String cardNumber;
+    @Column(nullable = false)
+    private String chunk;
 
     @Column(name = "date", nullable = false)
     private LocalDateTime date;
+
+    @Column(name = "client_id", nullable = false)
+    private Long idClient;
 
 }

@@ -4,6 +4,8 @@ import jakarta.persistence.*;
 import lombok.Getter;
 import lombok.Setter;
 
+import java.time.LocalDateTime;
+
 @Entity
 @Table(name = "client") // Nome da tabela que será criada/buscada no MySQL
 @Getter
@@ -16,4 +18,6 @@ public class ClientEntity {
     @Column(nullable = false, unique = true)
     private String name;
 
+    @Column(name = "date", nullable = false)
+    private LocalDateTime date;
 }

@@ -7,6 +7,10 @@ import com.hyperativa.card.service.CardService;
 import lombok.NonNull;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.context.request.NativeWebRequest;
+
+import java.util.List;
+import java.util.Optional;
 
 @RestController
 public class CardController implements ApiApi {
@@ -15,6 +19,18 @@ public class CardController implements ApiApi {
 
     public CardController(CardService cardService) {
         this.cardService = cardService;
+    }
+
+    @Override
+    public ResponseEntity<List<CardResponse>> getCardsByClient(String clientName) {
+        return ApiApi.super.getCardsByClient(clientName);
+    }
+
+    @Override
+    public ResponseEntity<CardResponse> registerCardForClient(String clientName, String cardNumber) {
+
+        cardService.save(clientName, cardNumber);
+        return ResponseEntity.ok().build();
     }
 
     @Override
