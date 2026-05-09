@@ -1,8 +1,8 @@
 package com.hyperativa.security.controller;
 
+import com.hyperativa.security.service.JwtService;
 import com.hyperativa.security.dto.AuthRequest;
 import com.hyperativa.security.dto.AuthResponse;
-import com.hyperativa.security.service.JwtService;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
