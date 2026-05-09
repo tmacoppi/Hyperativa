@@ -1,14 +1,13 @@
 openapi: 3.0.3
 info:
   title: Card Management API
-  description: API para cadastro e importação assíncrona de cartões de crédito.
   version: 1.0.0
 paths:
   /api/v1/cards/register:
     post:
       tags:
         - Card
-      summary: Cadastra um novo cartão
+      summary: Cadastra um ou vários cartões
       operationId: registerCard
       requestBody:
         required: true
@@ -18,33 +17,68 @@ paths:
               $ref: '#/components/schemas/CardRequest'
       responses:
         '200':
-          description: Cartão cadastrado com sucesso
-  /api/v1/cards/import:
-    post:
+          description: Cartões cadastrados com sucesso
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/CardResponse'
+
+  /api/v1/cards/client/{clientName}:
+    get:
       tags:
         - Card
-      summary: Inicia a importação de cartões via TXT
-      operationId: importCards
+      summary: Consulta os cartões de um cliente
+      operationId: getCardsByClient
+      parameters:
+        - name: clientName
+          in: path
+          required: true
+          schema:
+            type: string
       responses:
-        '202':
-          description: Processamento de importação iniciado em background
+        '200':
+          description: Lista de cartões do cliente
           content:
-            text/plain:
+            application/json:
               schema:
-                type: string
+                type: array
+                items:
+                  $ref: '#/components/schemas/CardResponse'
+
 components:
   schemas:
     CardRequest:
       type: object
-      required:
-        - clientName
-        - cardNumber
       properties:
-        clientName:
+        clients:
+          type: array
+          items:
+            $ref: '#/components/schemas/Client'
+
+    CardResponse:
+      type: object
+      properties:
+        clients:
+          type: array
+          items:
+            $ref: '#/components/schemas/Client'
+
+    Client:
+      type: object
+      properties:
+        id:
+          type: integer
+        name:
           type: string
-          description: Nome completo do titular do cartão
-          example: "João da Silva"
-        cardNumber:
+        cards:
+          type: array
+          items:
+            $ref: '#/components/schemas/Card'
+
+    Card:
+      type: object
+      properties:
+        id:
+          type: integer
+        number:
           type: string
-          description: Número completo do cartão de crédito
-          example: "1234567890123456"

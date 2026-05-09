@@ -2,6 +2,7 @@ package com.hyperativa.card.controller;
 
 import com.hyperativa.card.contract.ApiApi;
 import com.hyperativa.card.dto.CardRequest;
+import com.hyperativa.card.dto.CardResponse;
 import com.hyperativa.card.service.CardService;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.RestController;
@@ -16,9 +17,9 @@ public class CardController implements ApiApi {
     }
 
     @Override
-    public ResponseEntity<Void> registerCard(CardRequest request) {
+    public ResponseEntity<CardResponse> registerCard(CardRequest request) {
         // Os métodos getClientName() e getCardNumber() foram gerados no DTO
-        cardService.save(request.getClientName(), request.getCardNumber());
+        cardService.save(request.getClients());
         return ResponseEntity.ok().build();
     }
 
