@@ -3,6 +3,16 @@ info:
   title: Card Management API
   version: 1.0.0
 paths:
+  /api/v1/cards/import:
+    post:
+      tags:
+        - Card
+      summary: Inicia o processo de importação de cartões
+      operationId: importCards
+      responses:
+        '202':
+          description: Processamento de importação iniciado em segundo plano
+
   /api/v1/cards/register:
     post:
       tags:
@@ -80,5 +90,7 @@ components:
       properties:
         id:
           type: integer
-        number:
+        idClient:
+          type: integer
+        cardNumber:
           type: string

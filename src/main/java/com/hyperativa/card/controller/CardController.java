@@ -4,6 +4,7 @@ import com.hyperativa.card.contract.ApiApi;
 import com.hyperativa.card.dto.CardRequest;
 import com.hyperativa.card.dto.CardResponse;
 import com.hyperativa.card.service.CardService;
+import lombok.NonNull;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.RestController;
 
@@ -17,15 +18,15 @@ public class CardController implements ApiApi {
     }
 
     @Override
-    public ResponseEntity<CardResponse> registerCard(CardRequest request) {
+    public ResponseEntity<CardResponse> registerCard(@NonNull CardRequest request) {
         // Os métodos getClientName() e getCardNumber() foram gerados no DTO
         cardService.save(request.getClients());
         return ResponseEntity.ok().build();
     }
 
     @Override
-    public ResponseEntity<String> importCards() {
+    public ResponseEntity<Void> importCards() {
         cardService.importCardsFromFile();
-        return ResponseEntity.accepted().body("Processamento de importação iniciado em segundo plano.");
+        return ResponseEntity.accepted().build();
     }
 }

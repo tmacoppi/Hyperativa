@@ -19,7 +19,8 @@
         <maven.compiler.source>21</maven.compiler.source>
         <maven.compiler.target>21</maven.compiler.target>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
-        <java.version>21</java.version> <!-- Ajuste para a versão do Java que está usando -->
+        <java.version>21</java.version>
+        <org.mapstruct.version>1.5.5.Final</org.mapstruct.version>
     </properties>
 
     <dependencies>
@@ -77,17 +78,45 @@
             <artifactId>lombok</artifactId>
             <scope>provided</scope>
         </dependency>
+        <dependency>
+            <groupId>org.mapstruct</groupId>
+            <artifactId>mapstruct</artifactId>
+            <version>${org.mapstruct.version}</version>
+        </dependency>
     </dependencies>
 
     <build>
         <plugins>
-            <!-- Plugin nativo do Spring Boot -->
             <plugin>
                 <groupId>org.springframework.boot</groupId>
                 <artifactId>spring-boot-maven-plugin</artifactId>
             </plugin>
 
-            <!-- Plugin gerador do OpenAPI -->
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-compiler-plugin</artifactId>
+                <version>3.11.0</version>
+                <configuration>
+                    <source>${java.version}</source> <target>${java.version}</target>
+                    <annotationProcessorPaths>
+                        <path>
+                            <groupId>org.mapstruct</groupId>
+                            <artifactId>mapstruct-processor</artifactId>
+                            <version>1.5.5.Final</version>
+                        </path>
+                        <path>
+                            <groupId>org.projectlombok</groupId>
+                            <artifactId>lombok</artifactId>
+                            <version>${lombok.version}</version> </path>
+                        <path>
+                            <groupId>org.projectlombok</groupId>
+                            <artifactId>lombok-mapstruct-binding</artifactId>
+                            <version>0.2.0</version>
+                        </path>
+                    </annotationProcessorPaths>
+                </configuration>
+            </plugin>
+
             <plugin>
                 <groupId>org.openapitools</groupId>
                 <artifactId>openapi-generator-maven-plugin</artifactId>
@@ -98,22 +127,16 @@
                             <goal>generate</goal>
                         </goals>
                         <configuration>
-                            <!-- Aponta para o arquivo YAML que criamos -->
                             <inputSpec>${project.basedir}/src/main/resources/api/api.yaml</inputSpec>
 
-                            <!-- Usa o gerador do Spring -->
                             <generatorName>spring</generatorName>
 
-                            <!-- Define onde as classes geradas vão morar -->
                             <apiPackage>com.hyperativa.card.contract</apiPackage>
                             <modelPackage>com.hyperativa.card.dto</modelPackage>
 
                             <configOptions>
-                                <!-- Gera apenas as Interfaces, você implementa os Controllers -->
                                 <interfaceOnly>true</interfaceOnly>
-                                <!-- Garante compatibilidade com Spring Boot 3 (Jakarta EE) -->
                                 <useSpringBoot3>true</useSpringBoot3>
-                                <!-- Opcional: Ignora a geração de tags do Springfox antigas -->
                                 <openApiNullable>false</openApiNullable>
                             </configOptions>
                         </configuration>
