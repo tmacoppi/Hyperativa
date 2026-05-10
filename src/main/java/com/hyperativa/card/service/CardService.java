@@ -172,19 +172,19 @@ public class CardService {
 
         try (BufferedReader reader = Files.newBufferedReader(filePath, StandardCharsets.UTF_8)) {
 
-            String linhaAtual;
+            String line;
 
-            while ((linhaAtual = reader.readLine()) != null) {
+            while ((line = reader.readLine()) != null) {
 
-                if (linhaAtual.trim().isEmpty()) {
+                if (line.trim().isEmpty()) {
                     continue;
                 }
 
                 // [01-29]NOME   [30-37]DATA   [38-45]LOTE   [46-51]QTD DE REGISTROS
-                String clientName = linhaAtual.substring(0, 29).trim();
-                String clientDate = linhaAtual.substring(29, 37).trim();
-                String lote = linhaAtual.substring(37, 45).trim();
-                String qtdString = linhaAtual.substring(45, 51).trim();
+                String clientName = line.substring(0, 29).trim();
+                String clientDate = line.substring(29, 37).trim();
+                String chunk = line.substring(37, 45).trim();
+                String cardsSizeS = line.substring(45, 51).trim();
 
                 clientEntity = clientRepository.findByName( clientName).orElse(null);
                 if (clientEntity == null) {
@@ -202,36 +202,36 @@ public class CardService {
                         Integer.parseInt(clientDate.substring(4,6)),
                         Integer.parseInt(clientDate.substring(6,8))));
                 importEntity.setDate(LocalDateTime.now());
-                importEntity.setChunk(lote);
+                importEntity.setChunk(chunk);
                 importRepository.save(importEntity);
 
                 cards = new ArrayList<>();
 
-                int qtdCartoes = Integer.parseInt(qtdString);
+                int cardsSize = Integer.parseInt(cardsSizeS);
 
-                log.info("Processando cliente: {} com {} cartões.", clientName, qtdCartoes);
+                log.info("Processando cliente: {} com {} cartões.", clientName, cardsSize);
 
-                for (int i = 0; i < qtdCartoes; i++) {
+                for (int i = 0; i < cardsSize; i++) {
                     cardEntity = new CardEntity();
 
-                    String linhaDetalhe = reader.readLine();
+                    String detail = reader.readLine();
 
                     // Proteção caso o arquivo acabe no meio do bloco de forma inesperada
-                    if (linhaDetalhe == null) {
+                    if (detail == null) {
                         log.error("Arquivo terminou prematuramente antes de ler todos os cartões do cliente {}", clientName);
                         break;
                     }
 
                     // [01-01]IDENTIFICADOR DA LINHA   [02-07]NUMERAÇÃO NO LOTE   [08-26]NÚMERO DE CARTAO COMPLETO
-                    String lineId = linhaDetalhe.substring(0, 1).trim();
-                    String numeroLote = linhaDetalhe.substring(1, 7).trim();
-                    String cartaoNumero = "";
-                    if (linhaDetalhe.length() > 50)
-                        cartaoNumero = linhaDetalhe.substring(7, 51).trim();
+                    //String lineId = detail.substring(0, 1).trim();
+                    //String chunkNumber = detail.substring(1, 7).trim();
+                    String cardNumber = "";
+                    if (detail.length() > 50)
+                        cardNumber = detail.substring(7, 51).trim();
                     else
-                        cartaoNumero = linhaDetalhe.substring(7).trim();
+                        cardNumber = detail.substring(7).trim();
 
-                    cardEntity.setCardNumber(cartaoNumero);
+                    cardEntity.setCardNumber(cardNumber);
                     cardEntity.setIdImport(importEntity.getId());
                     cardEntity.setDate(LocalDateTime.now());
                     cardEntity.setIdClient(clientEntity.getId());
@@ -241,11 +241,11 @@ public class CardService {
                 cardRepository.saveAll(cards);
 
                 // 3. LÊ O RESUMO (Trailer)
-                String linhaResumo = reader.readLine();
+                String trailer = reader.readLine();
 
-                if (linhaResumo != null) {
+                if (trailer != null) {
                     // Extrai os dados do resumo (Exemplo: posições 0-10 Totalizadores)
-                    String infoResumo = linhaResumo.substring(0, 10).trim();
+                    String infoResumo = trailer.substring(0, 10).trim();
                 }
             }
 
