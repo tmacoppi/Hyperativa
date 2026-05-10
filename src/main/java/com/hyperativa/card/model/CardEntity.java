@@ -19,6 +19,9 @@ public class CardEntity {
     @Column(name = "client_id", nullable = false)
     private Long idClient;
 
+    @Column(name = "import_id", nullable = false)
+    private Long idImport;
+
     @Column(name = "card_number", nullable = false, unique = true)
     private String cardNumber;
 

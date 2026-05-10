@@ -119,6 +119,8 @@ components:
           type: integer
         idClient:
           type: integer
+        idImport:
+          type: integer
         cardNumber:
           type: string
         date:

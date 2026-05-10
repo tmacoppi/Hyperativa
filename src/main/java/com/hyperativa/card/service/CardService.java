@@ -6,8 +6,10 @@ import com.hyperativa.card.mapper.CardMapper;
 import com.hyperativa.card.mapper.ClientMapper;
 import com.hyperativa.card.model.CardEntity;
 import com.hyperativa.card.model.ClientEntity;
+import com.hyperativa.card.model.ImportEntity;
 import com.hyperativa.card.repository.CardRepository;
 import com.hyperativa.card.repository.ClientRepository;
+import com.hyperativa.card.repository.ImportRepository;
 import lombok.NonNull;
 import org.springframework.scheduling.annotation.Async;
 import org.springframework.stereotype.Service;
@@ -28,6 +30,7 @@ public class CardService {
 
     private final ClientRepository clientRepository;
     private final CardRepository cardRepository;
+    private final ImportRepository importRepository;
     private final ClientMapper clientMapper;
     private final CardMapper cardMapper;
 
@@ -35,10 +38,12 @@ public class CardService {
 
     public CardService(ClientRepository clientRepository,
                        CardRepository cardRepository,
+                       ImportRepository importRepository,
                        ClientMapper clientMapper,
                        CardMapper cardMapper){
         this.clientRepository = clientRepository;
         this.cardRepository = cardRepository;
+        this.importRepository = importRepository;
         this.clientMapper = clientMapper;
         this.cardMapper = cardMapper;
     }
@@ -94,10 +99,9 @@ public class CardService {
 
         Path filePath = Paths.get("C:\\Dev\\import\\hyperativa\\DESAFIO-HYPERATIVA.txt");
 
-        List<Client> clients = new ArrayList<>();
-        Client client = null;
-        List<Card> cards = null;
-        Card card = null;
+        ClientEntity clientEntity = null;
+        CardEntity cardEntity = null;
+        List<CardEntity> cards;
 
         try (BufferedReader reader = Files.newBufferedReader(filePath, StandardCharsets.UTF_8)) {
 
@@ -115,8 +119,23 @@ public class CardService {
                 String lote = linhaAtual.substring(37, 45).trim();
                 String qtdString = linhaAtual.substring(45, 51).trim();
 
-                client = new Client();
-                client.setName(clientName);
+                clientEntity = clientRepository.findByName( clientName);
+                if (clientEntity == null) {
+                    clientEntity = new ClientEntity();
+                    clientEntity.setName(clientName);
+                    clientEntity.setDate(LocalDateTime.now());
+                    clientRepository.save(clientEntity);
+                }
+
+                ImportEntity importEntity = new ImportEntity();
+                importEntity.setIdClient(clientEntity.getId());
+                importEntity.setFileName(filePath.getFileName().toString());
+                importEntity.setDate(LocalDateTime.of(
+                        Integer.parseInt(clientDate.substring(0,4)),
+                        Integer.parseInt(clientDate.substring(4,6)),
+                        Integer.parseInt(clientDate.substring(6,8)), 0, 0));
+                importEntity.setChunk(lote);
+                importRepository.save(importEntity);
 
                 cards = new ArrayList<>();
 
@@ -125,9 +144,7 @@ public class CardService {
                 System.out.println("Processando cliente: " + clientName + " com " + qtdCartoes + " cartões.");
 
                 for (int i = 0; i < qtdCartoes; i++) {
-                    System.out.println("i: " + i);
-
-                    card = new Card();
+                    cardEntity = new CardEntity();
 
                     String linhaDetalhe = reader.readLine();
 
@@ -140,17 +157,22 @@ public class CardService {
                     // [01-01]IDENTIFICADOR DA LINHA   [02-07]NUMERAÇÃO NO LOTE   [08-26]NÚMERO DE CARTAO COMPLETO
                     String lineId = linhaDetalhe.substring(0, 1).trim();
                     String numeroLote = linhaDetalhe.substring(1, 7).trim();
-                    String cartaoNumero = linhaDetalhe.substring(7).trim();
+                    String cartaoNumero = "";
+                    if (linhaDetalhe.length() > 50)
+                        cartaoNumero = linhaDetalhe.substring(7, 51).trim();
+                    else
+                        cartaoNumero = linhaDetalhe.substring(7).trim();
 
-                    card.setCardNumber(cartaoNumero);
-                    cards.add(card);
+                    cardEntity.setCardNumber(cartaoNumero);
+                    cardEntity.setIdImport(importEntity.getId());
+                    cardEntity.setDate(LocalDateTime.now());
+                    cardEntity.setIdClient(clientEntity.getId());
+                    cards.add(cardEntity);
                 }
 
-                client.setCards(cards);
-                clients.add(client);
+                cardRepository.saveAll(cards);
 
                 // 3. LÊ O RESUMO (Trailer)
-                // Após ler os N detalhes, a próxima linha obrigatoriamente é o resumo
                 String linhaResumo = reader.readLine();
 
                 if (linhaResumo != null) {
@@ -161,8 +183,6 @@ public class CardService {
                     System.out.println("Resumo do bloco processado: " + infoResumo);
                 }
             }
-
-            save(clients);
 
             System.out.println("Processamento assíncrono finalizado com sucesso.");
 
