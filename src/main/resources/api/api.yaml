@@ -78,6 +78,27 @@ paths:
               schema:
                 $ref: '#/components/schemas/CardResponse'
 
+  /api/v1/cards/card/{cardNumber}:
+    get:
+      tags:
+        - Card
+      summary: Consulta um cartão pelo numero
+      operationId: getCardByCardNumber
+      parameters:
+        - name: cardNumber
+          in: path
+          required: true
+          schema:
+            type: string
+      responses:
+        '200':
+          description: Lista de cartões do cliente
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/CardResponse'
+
+
 components:
   schemas:
     CardRequest:

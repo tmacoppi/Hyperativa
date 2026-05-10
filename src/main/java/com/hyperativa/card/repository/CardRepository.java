@@ -10,4 +10,6 @@ public interface CardRepository extends JpaRepository<CardEntity, Long> {
     boolean existsByCardNumber(String cardNumber);
 
     List<CardEntity> findAllByIdClient(Long id);
+
+    CardEntity findByCardNumber(String cardNumber);
 }

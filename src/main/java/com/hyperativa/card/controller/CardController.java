@@ -44,6 +44,14 @@ public class CardController implements ApiApi {
     }
 
     @Override
+    public ResponseEntity<CardResponse> getCardByCardNumber(String cardNumber) {
+        log.info("getCardByCardNumber - cardNumber: {}", cardNumber);
+        CardResponse response = new CardResponse();
+        response.setClients(cardService.getCardByCardNumber(cardNumber));
+        return ResponseEntity.ok().body(response);
+    }
+
+    @Override
     public ResponseEntity<Void> importCards() {
         log.info("importCards...");
         cardService.importCardsFromFile();

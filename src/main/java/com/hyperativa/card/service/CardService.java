@@ -73,6 +73,26 @@ public class CardService {
         return clients;
     }
 
+    public List<Client> getCardByCardNumber(String cardNumber){
+        List<Client> clients = new ArrayList<>();
+
+        CardEntity cardEntity = cardRepository.findByCardNumber(cardNumber);
+
+        ClientEntity clientEntity = clientRepository.findById(cardEntity.getIdClient())
+                .orElseThrow(() -> new RuntimeException("Cliente não encontrado"));
+
+        Client client = clientMapper.toDto(clientEntity);
+        List<Card> cards = new ArrayList<>();
+
+        Card card = cardMapper.toDto(cardEntity);
+        cards.add(card);
+
+        client.setCards(cards);
+        clients.add(client);
+
+        return clients;
+    }
+
     public List<Client> save(String clientName, String cardNumber){
         List<Client> clients = new ArrayList<>();
 
