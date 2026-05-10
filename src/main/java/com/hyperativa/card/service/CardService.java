@@ -73,7 +73,9 @@ public class CardService {
         return clients;
     }
 
-    public void save(String clientName, String cardNumber){
+    public List<Client> save(String clientName, String cardNumber){
+        List<Client> clients = new ArrayList<>();
+
         ClientEntity clientEntity = clientRepository.findByName(clientName);
         if (clientEntity == null) {
             clientEntity = new ClientEntity();
@@ -82,14 +84,27 @@ public class CardService {
             clientRepository.save(clientEntity);
         }
 
+        Client client = clientMapper.toDto(clientEntity);
+
         CardEntity cardEntity = new CardEntity();
         cardEntity.setIdClient(clientEntity.getId());
         cardEntity.setCardNumber(cardNumber);
         cardEntity.setDate(LocalDateTime.now());
         cardRepository.save(cardEntity);
+
+        List<Card> cards = new ArrayList<>();
+        Card card = cardMapper.toDto(cardEntity);
+
+        cards.add(card);
+        client.setCards(cards);
+        clients.add(client);
+
+        return clients;
     }
 
-    public void save(@NonNull List<Client> clients) {
+    public List<Client> save(@NonNull List<Client> clients) {
+        List<Client> clients1 = new ArrayList<>();
+        Client client1;
         ClientEntity clientEntity = null;
         CardEntity cardEntity = null;
         List<CardEntity> cardList;
@@ -103,6 +118,8 @@ public class CardService {
                 clientRepository.save(clientEntity);
             }
 
+            client1 = clientMapper.toDto(clientEntity);
+
             for (Card card : client.getCards()){
                 cardEntity = cardMapper.toEntity(card);
                 cardEntity.setIdClient(clientEntity.getId());
@@ -114,8 +131,14 @@ public class CardService {
             }
 
             cardRepository.saveAll(cardList);
+
+            cardList = cardRepository.findAllByIdClient(clientEntity.getId());
+
+            client1.setCards(cardMapper.toDto(cardList));
+            clients1.add(client1);
         }
 
+        return clients1;
     }
 
     @Async

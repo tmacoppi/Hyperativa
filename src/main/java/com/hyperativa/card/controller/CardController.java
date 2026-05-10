@@ -9,8 +9,6 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.RestController;
 
-import java.util.List;
-
 @Slf4j
 @RestController
 public class CardController implements ApiApi {
@@ -23,7 +21,7 @@ public class CardController implements ApiApi {
 
     @Override
     public ResponseEntity<CardResponse> getCardsByClient(String clientName) {
-        log.info("getCardsByClient...");
+        log.info("getCardsByClient - clientName: {}", clientName);
         CardResponse response = new CardResponse();
         response.setClients(cardService.getCardsByClient(clientName));
         return ResponseEntity.ok().body(response);
@@ -31,19 +29,23 @@ public class CardController implements ApiApi {
 
     @Override
     public ResponseEntity<CardResponse> registerCardForClient(String clientName, String cardNumber) {
-
-        cardService.save(clientName, cardNumber);
-        return ResponseEntity.ok().build();
+        log.info("registerCardForClient - clientName: {}, cardNumber: {}", clientName, cardNumber);
+        CardResponse response = new CardResponse();
+        response.setClients(cardService.save(clientName, cardNumber));
+        return ResponseEntity.ok().body(response);
     }
 
     @Override
     public ResponseEntity<CardResponse> registerCard(@NonNull CardRequest request) {
-        cardService.save(request.getClients());
-        return ResponseEntity.ok().build();
+        log.info("registerCard - request: {}", request);
+        CardResponse response = new CardResponse();
+        response.setClients(cardService.save(request.getClients()));
+        return ResponseEntity.ok().body(response);
     }
 
     @Override
     public ResponseEntity<Void> importCards() {
+        log.info("importCards...");
         cardService.importCardsFromFile();
         return ResponseEntity.accepted().build();
     }
