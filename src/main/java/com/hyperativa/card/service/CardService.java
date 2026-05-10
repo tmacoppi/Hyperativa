@@ -53,10 +53,8 @@ public class CardService {
     public List<Client> getCardsByClient(String clientName){
         List<Client> clients = new ArrayList<>();
 
-        ClientEntity clientEntity = clientRepository.findByName(clientName);
-        if (clientEntity == null) {
-            return null;
-        }
+        ClientEntity clientEntity = clientRepository.findByName(clientName)
+                .orElseThrow(() -> new RuntimeException("Cliente [" + clientName + "] não encontrado."));;
 
         Client client = clientMapper.toDto(clientEntity);
         List<CardEntity> cardEntities = cardRepository.findAllByIdClient(clientEntity.getId());
@@ -76,7 +74,8 @@ public class CardService {
     public List<Client> getCardByCardNumber(String cardNumber){
         List<Client> clients = new ArrayList<>();
 
-        CardEntity cardEntity = cardRepository.findByCardNumber(cardNumber);
+        CardEntity cardEntity = cardRepository.findByCardNumber(cardNumber)
+                .orElseThrow(() -> new RuntimeException("Cartão não encontrado"));
 
         ClientEntity clientEntity = clientRepository.findById(cardEntity.getIdClient())
                 .orElseThrow(() -> new RuntimeException("Cliente não encontrado"));
@@ -96,7 +95,7 @@ public class CardService {
     public List<Client> save(String clientName, String cardNumber){
         List<Client> clients = new ArrayList<>();
 
-        ClientEntity clientEntity = clientRepository.findByName(clientName);
+        ClientEntity clientEntity = clientRepository.findByName(clientName).orElse(null);
         if (clientEntity == null) {
             clientEntity = new ClientEntity();
             clientEntity.setName(clientName);
@@ -131,7 +130,7 @@ public class CardService {
 
         for (Client client : clients){
             cardList = new ArrayList<>();
-            clientEntity = clientRepository.findByName( client.getName());
+            clientEntity = clientRepository.findByName( client.getName()).orElse(null);
             if (clientEntity == null) {
                 clientEntity = clientMapper.toEntity(client);
                 clientEntity.setDate(LocalDateTime.now());
@@ -187,7 +186,7 @@ public class CardService {
                 String lote = linhaAtual.substring(37, 45).trim();
                 String qtdString = linhaAtual.substring(45, 51).trim();
 
-                clientEntity = clientRepository.findByName( clientName);
+                clientEntity = clientRepository.findByName( clientName).orElse(null);
                 if (clientEntity == null) {
                     clientEntity = new ClientEntity();
                     clientEntity.setName(clientName);

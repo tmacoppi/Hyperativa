@@ -24,6 +24,7 @@ public class CardController implements ApiApi {
         log.info("getCardsByClient - clientName: {}", clientName);
         CardResponse response = new CardResponse();
         response.setClients(cardService.getCardsByClient(clientName));
+        log.info("getCardsByClient - response: {}", response);
         return ResponseEntity.ok().body(response);
     }
 
@@ -32,6 +33,7 @@ public class CardController implements ApiApi {
         log.info("registerCardForClient - clientName: {}, cardNumber: {}", clientName, cardNumber);
         CardResponse response = new CardResponse();
         response.setClients(cardService.save(clientName, cardNumber));
+        log.info("registerCardForClient - response: {}", response);
         return ResponseEntity.ok().body(response);
     }
 
@@ -40,6 +42,7 @@ public class CardController implements ApiApi {
         log.info("registerCard - request: {}", request);
         CardResponse response = new CardResponse();
         response.setClients(cardService.save(request.getClients()));
+        log.info("registerCard - response: {}", response);
         return ResponseEntity.ok().body(response);
     }
 
@@ -48,6 +51,7 @@ public class CardController implements ApiApi {
         log.info("getCardByCardNumber - cardNumber: {}", cardNumber);
         CardResponse response = new CardResponse();
         response.setClients(cardService.getCardByCardNumber(cardNumber));
+        log.info("getCardByCardNumber - response: {}", response);
         return ResponseEntity.ok().body(response);
     }
 
