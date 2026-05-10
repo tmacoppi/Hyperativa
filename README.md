@@ -42,26 +42,26 @@ src/main/resources/database.sql
 
 ## Project Structure
 
-src/main/java/com.hyperativa 
-├── card 
-│ ├── config 
-│ ├── controller 
-│ ├── exception 
-│ ├── mapper 
-│ ├── model 
-│ ├── repository 
-│ └── service 
-├── security 
-│ ├── config 
-│ ├── controller 
-│ ├── dto 
-│ └── service 
-└── Main.java
-src/main/resources 
-├── api/api.yaml 
-├── application.properties 
-├── database.sql 
-└── log4j2-spring.xml
+src/main/java/com.hyperativa <br>
+├── card <br>
+│ ├── config <br>
+│ ├── controller <br>
+│ ├── exception <br>
+│ ├── mapper <br>
+│ ├── model <br>
+│ ├── repository <br>
+│ └── service <br>
+├── security <br>
+│ ├── config <br>
+│ ├── controller <br>
+│ ├── dto <br>
+│ └── service <br>
+└── Main.java<br>
+src/main/resources <br>
+├── api/api.yaml <br>
+├── application.properties <br>
+├── database.sql <br>
+└── log4j2-spring.xml <br>
 
 
 ## Database Schema Overview
