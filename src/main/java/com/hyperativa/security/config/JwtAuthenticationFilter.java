@@ -1,5 +1,6 @@
 package com.hyperativa.security.config;
 
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.core.userdetails.UserDetails;
@@ -15,6 +16,7 @@ import org.springframework.web.filter.OncePerRequestFilter;
 
 import java.io.IOException;
 
+@Slf4j
 @Component
 public class JwtAuthenticationFilter extends OncePerRequestFilter {
 
@@ -46,7 +48,7 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
             username = jwtService.extractUsername(jwt);
 
             // LOG para depuração: Mostra se o filtro conseguiu ler o usuário do token
-            System.out.println("DEBUG: Usuário extraído do Token: " + username);
+            log.info("DEBUG: Usuário extraído do Token: {}", username);
 
             // 3. Se temos um usuário e ele ainda não está autenticado no contexto atual
             if (username != null && SecurityContextHolder.getContext().getAuthentication() == null) {
@@ -61,13 +63,13 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
 
                     // 5. Autentica o usuário para esta requisição!
                     SecurityContextHolder.getContext().setAuthentication(authToken);
-                    System.out.println("DEBUG: Usuário autenticado com sucesso!");
+                    log.info("DEBUG: Usuário autenticado com sucesso!");
                 } else {
-                    System.out.println("DEBUG: Token inválido ou expirado.");
+                    log.error("DEBUG: Token inválido ou expirado.");
                 }
             }
         } catch (Exception e) {
-            System.err.println("DEBUG: Falha ao processar o JWT - " + e.getMessage());
+            log.error("DEBUG: Falha ao processar o JWT - {}", e.getMessage());
         }
 
         // 6. Continua a cadeia de filtros e chega no Controller

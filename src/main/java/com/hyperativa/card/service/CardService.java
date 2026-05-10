@@ -11,6 +11,7 @@ import com.hyperativa.card.repository.CardRepository;
 import com.hyperativa.card.repository.ClientRepository;
 import com.hyperativa.card.repository.ImportRepository;
 import lombok.NonNull;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.scheduling.annotation.Async;
 import org.springframework.stereotype.Service;
 
@@ -20,11 +21,12 @@ import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
+import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.stream.Stream;
 
+@Slf4j
 @Service
 public class CardService {
 
@@ -46,6 +48,29 @@ public class CardService {
         this.importRepository = importRepository;
         this.clientMapper = clientMapper;
         this.cardMapper = cardMapper;
+    }
+
+    public List<Client> getCardsByClient(String clientName){
+        List<Client> clients = new ArrayList<>();
+
+        ClientEntity clientEntity = clientRepository.findByName(clientName);
+        if (clientEntity == null) {
+            return null;
+        }
+
+        Client client = clientMapper.toDto(clientEntity);
+        List<CardEntity> cardEntities = cardRepository.findAllByIdClient(clientEntity.getId());
+        List<Card> cards = new ArrayList<>();
+
+        for (CardEntity cardEntity : cardEntities) {
+            Card card = cardMapper.toDto(cardEntity);
+            cards.add(card);
+        }
+
+        client.setCards(cards);
+        clients.add(client);
+
+        return clients;
     }
 
     public void save(String clientName, String cardNumber){
@@ -95,7 +120,7 @@ public class CardService {
 
     @Async
     public void importCardsFromFile() {
-        System.out.println("Iniciando importação na Virtual Thread: " + Thread.currentThread().getName());
+        log.info("Iniciando importação na Virtual Thread: {}", Thread.currentThread().getName());
 
         Path filePath = Paths.get("C:\\Dev\\import\\hyperativa\\DESAFIO-HYPERATIVA.txt");
 
@@ -130,10 +155,11 @@ public class CardService {
                 ImportEntity importEntity = new ImportEntity();
                 importEntity.setIdClient(clientEntity.getId());
                 importEntity.setFileName(filePath.getFileName().toString());
-                importEntity.setDate(LocalDateTime.of(
+                importEntity.setFileDate(LocalDate.of(
                         Integer.parseInt(clientDate.substring(0,4)),
                         Integer.parseInt(clientDate.substring(4,6)),
-                        Integer.parseInt(clientDate.substring(6,8)), 0, 0));
+                        Integer.parseInt(clientDate.substring(6,8))));
+                importEntity.setDate(LocalDateTime.now());
                 importEntity.setChunk(lote);
                 importRepository.save(importEntity);
 
@@ -141,7 +167,7 @@ public class CardService {
 
                 int qtdCartoes = Integer.parseInt(qtdString);
 
-                System.out.println("Processando cliente: " + clientName + " com " + qtdCartoes + " cartões.");
+                log.info("Processando cliente: {} com {} cartões.", clientName, qtdCartoes);
 
                 for (int i = 0; i < qtdCartoes; i++) {
                     cardEntity = new CardEntity();
@@ -150,7 +176,7 @@ public class CardService {
 
                     // Proteção caso o arquivo acabe no meio do bloco de forma inesperada
                     if (linhaDetalhe == null) {
-                        System.err.println("Arquivo terminou prematuramente antes de ler todos os cartões do cliente " + clientName);
+                        log.error("Arquivo terminou prematuramente antes de ler todos os cartões do cliente {}", clientName);
                         break;
                     }
 
@@ -178,23 +204,16 @@ public class CardService {
                 if (linhaResumo != null) {
                     // Extrai os dados do resumo (Exemplo: posições 0-10 Totalizadores)
                     String infoResumo = linhaResumo.substring(0, 10).trim();
-
-                    // TODO: Sua lógica para validar ou salvar o resumo
-                    System.out.println("Resumo do bloco processado: " + infoResumo);
                 }
             }
 
-            System.out.println("Processamento assíncrono finalizado com sucesso.");
+            log.info("Processamento assíncrono finalizado com sucesso.");
 
         } catch (IOException e) {
-            System.err.println("Erro crítico ao ler o arquivo TXT: " + e.getMessage());
+            log.error("Erro crítico ao ler o arquivo TXT: {}", e.getMessage());
         } catch (NumberFormatException e) {
-            System.err.println("Erro de formatação posicional (não foi possível converter para número): " + e.getMessage());
+            log.error("Erro de formatação posicional (não foi possível converter para número): {}", e.getMessage());
         }
-    }
-
-    private void gravarCartaoExistente(String nome, String numero) {
-        // Sua lógica atual do banco de dados...
     }
 
 }

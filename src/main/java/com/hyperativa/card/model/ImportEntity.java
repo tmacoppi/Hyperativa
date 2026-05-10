@@ -4,6 +4,7 @@ import jakarta.persistence.*;
 import lombok.Getter;
 import lombok.Setter;
 
+import java.time.LocalDate;
 import java.time.LocalDateTime;
 
 @Entity
@@ -24,6 +25,9 @@ public class ImportEntity {
 
     @Column(name = "date", nullable = false)
     private LocalDateTime date;
+
+    @Column(name = "file_date", nullable = false)
+    private LocalDate fileDate;
 
     @Column(name = "client_id", nullable = false)
     private Long idClient;

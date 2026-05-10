@@ -76,9 +76,7 @@ paths:
           content:
             application/json:
               schema:
-                type: array
-                items:
-                  $ref: '#/components/schemas/CardResponse'
+                $ref: '#/components/schemas/CardResponse'
 
 components:
   schemas:

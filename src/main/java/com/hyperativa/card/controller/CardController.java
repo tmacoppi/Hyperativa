@@ -5,13 +5,13 @@ import com.hyperativa.card.dto.CardRequest;
 import com.hyperativa.card.dto.CardResponse;
 import com.hyperativa.card.service.CardService;
 import lombok.NonNull;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.RestController;
-import org.springframework.web.context.request.NativeWebRequest;
 
 import java.util.List;
-import java.util.Optional;
 
+@Slf4j
 @RestController
 public class CardController implements ApiApi {
 
@@ -22,8 +22,11 @@ public class CardController implements ApiApi {
     }
 
     @Override
-    public ResponseEntity<List<CardResponse>> getCardsByClient(String clientName) {
-        return ApiApi.super.getCardsByClient(clientName);
+    public ResponseEntity<CardResponse> getCardsByClient(String clientName) {
+        log.info("getCardsByClient...");
+        CardResponse response = new CardResponse();
+        response.setClients(cardService.getCardsByClient(clientName));
+        return ResponseEntity.ok().body(response);
     }
 
     @Override
@@ -35,7 +38,6 @@ public class CardController implements ApiApi {
 
     @Override
     public ResponseEntity<CardResponse> registerCard(@NonNull CardRequest request) {
-        // Os métodos getClientName() e getCardNumber() foram gerados no DTO
         cardService.save(request.getClients());
         return ResponseEntity.ok().build();
     }

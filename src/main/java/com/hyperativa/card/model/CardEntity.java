@@ -1,5 +1,6 @@
 package com.hyperativa.card.model;
 
+import com.hyperativa.card.config.EncryptionConverter;
 import jakarta.persistence.*;
 import lombok.Getter;
 import lombok.Setter;
@@ -22,6 +23,7 @@ public class CardEntity {
     @Column(name = "import_id", nullable = false)
     private Long idImport;
 
+    @Convert(converter = EncryptionConverter.class)
     @Column(name = "card_number", nullable = false, unique = true)
     private String cardNumber;
 
